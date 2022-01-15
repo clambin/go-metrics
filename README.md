@@ -5,4 +5,15 @@
 ![Go Report Card](https://goreportcard.com/badge/github.com/clambin/metrics)
 ![GitHub](https://img.shields.io/github/license/clambin/metrics?style=plastic)
 
-Some reusable metrics code I found myself writing over and over.
+Some reusable metrics code I found myself writing over and over
+
+## Documentation
+* [pkg.go.dev](https://pkg.go.dev/github.com/clambin/metrics)
+
+## Authors
+
+* **Christophe Lambin**
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
