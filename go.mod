@@ -1,4 +1,4 @@
-module github.com/clambin/metrics
+module github.com/clambin/go-metrics
 
 go 1.17
 

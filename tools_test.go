@@ -1,7 +1,7 @@
 package metrics_test
 
 import (
-	"github.com/clambin/metrics"
+	"github.com/clambin/go-metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"testing"

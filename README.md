@@ -1,14 +1,14 @@
-# gotools
-![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/clambin/metrics?color=green&label=Release&style=plastic)
-![Codecov](https://img.shields.io/codecov/c/gh/clambin/metrics?style=plastic)
-![Test](https://github.com/clambin/metrics/workflows/Test/badge.svg)
-![Go Report Card](https://goreportcard.com/badge/github.com/clambin/metrics)
-![GitHub](https://img.shields.io/github/license/clambin/metrics?style=plastic)
+# go-metrics
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/clambin/go-metrics?color=green&label=Release&style=plastic)
+![Codecov](https://img.shields.io/codecov/c/gh/clambin/go-metrics?style=plastic)
+![Test](https://github.com/clambin/go-metrics/workflows/Test/badge.svg)
+![Go Report Card](https://goreportcard.com/badge/github.com/clambin/go-metrics)
+![GitHub](https://img.shields.io/github/license/clambin/go-metrics?style=plastic)
 
-Some reusable metrics code I found myself writing over and over
+Some reusable go-metrics code I found myself writing over and over
 
 ## Documentation
-* [pkg.go.dev](https://pkg.go.dev/github.com/clambin/metrics)
+* [pkg.go.dev](https://pkg.go.dev/github.com/clambin/go-metrics)
 
 ## Authors
 

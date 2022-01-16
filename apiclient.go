@@ -12,8 +12,8 @@ type APIClientMetrics struct {
 //
 //	err := callAPI(server, endpoint)
 //	pm.ReportErrors(err)
-func (pm APIClientMetrics) ReportErrors(err error, labelValues ...string) {
-	if pm.Errors == nil {
+func (pm *APIClientMetrics) ReportErrors(err error, labelValues ...string) {
+	if pm == nil || pm.Errors == nil {
 		return
 	}
 
@@ -32,8 +32,8 @@ func (pm APIClientMetrics) ReportErrors(err error, labelValues ...string) {
 //	if timer != nil {
 //		timer.ObserveDuration()
 //	}
-func (pm APIClientMetrics) MakeLatencyTimer(labelValues ...string) (timer *prometheus.Timer) {
-	if pm.Latency != nil {
+func (pm *APIClientMetrics) MakeLatencyTimer(labelValues ...string) (timer *prometheus.Timer) {
+	if pm != nil && pm.Latency != nil {
 		timer = prometheus.NewTimer(pm.Latency.WithLabelValues(labelValues...))
 	}
 	return

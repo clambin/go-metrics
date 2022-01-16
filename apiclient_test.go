@@ -2,7 +2,7 @@ package metrics_test
 
 import (
 	"errors"
-	"github.com/clambin/metrics"
+	"github.com/clambin/go-metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/stretchr/testify/assert"
@@ -69,4 +69,12 @@ func TestAPIClientMetrics_ReportErrors(t *testing.T) {
 	go cfg.Errors.Collect(ch)
 	m = <-ch
 	assert.Equal(t, 1.0, metrics.MetricValue(m).GetCounter().GetValue())
+}
+
+func TestAPIClientMetrics_Nil(t *testing.T) {
+	cfg := metrics.APIClientMetrics{}
+
+	timer := cfg.MakeLatencyTimer("foo")
+	assert.Nil(t, timer)
+	cfg.ReportErrors(nil, "foo")
 }
