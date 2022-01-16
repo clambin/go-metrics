@@ -28,7 +28,7 @@ func MetricName(metric prometheus.Metric) (name string) {
 //
 // Panics if metric is not a valid Prometheus metric.
 func MetricValue(metric prometheus.Metric) *pcg.Metric {
-	m := new(pcg.Metric)
+	m := &pcg.Metric{}
 	if metric.Write(m) != nil {
 		panic("failed to parse metric")
 	}
@@ -37,12 +37,7 @@ func MetricValue(metric prometheus.Metric) *pcg.Metric {
 
 // MetricLabel returns the value of a metric's label. Panics if metric is not a valid Prometheus metric.
 func MetricLabel(metric prometheus.Metric, labelName string) (value string) {
-	var m pcg.Metric
-
-	if metric.Write(&m) != nil {
-		panic("failed to parse metric")
-	}
-
+	m := MetricValue(metric)
 	for _, label := range m.GetLabel() {
 		if label.GetName() == labelName {
 			value = label.GetValue()

@@ -73,18 +73,24 @@ func TestNewServerWithHandlers(t *testing.T) {
 }
 
 func TestServer_Metrics(t *testing.T) {
-	s := metrics.NewServerWithHandlers(0, []metrics.Handler{{
-		Path: "/hello",
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.Method == "POST" {
-				w.WriteHeader(http.StatusOK)
+	s := metrics.NewServerWithHandlers(0, []metrics.Handler{
+		{
+			Path: "/hello",
+			Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				// don't call WriteHeader to test that middleware metrics defaults to HTTP 200
 				_, _ = w.Write([]byte("hello!"))
-				return
-			}
-			http.Error(w, "only POST is allowed", http.StatusBadRequest)
-		}),
-		Methods: []string{http.MethodPost},
-	}})
+			}),
+			Methods: []string{},
+		},
+		{
+			Path: "/hello2",
+			Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				w.WriteHeader(http.StatusCreated)
+				_, _ = w.Write([]byte("hello2!"))
+			}),
+			Methods: []string{http.MethodPost},
+		},
+	})
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -94,14 +100,20 @@ func TestServer_Metrics(t *testing.T) {
 		wg.Done()
 	}()
 
-	body, err := httpPost(fmt.Sprintf("http://127.0.0.1:%d/hello", s.Port), "", nil)
+	body, err := httpGet(fmt.Sprintf("http://127.0.0.1:%d/hello", s.Port))
 	require.NoError(t, err)
 	assert.Equal(t, "hello!", body)
+
+	body, err = httpPost(fmt.Sprintf("http://127.0.0.1:%d/hello2", s.Port), "", nil)
+	require.NoError(t, err)
+	assert.Equal(t, "hello2!", body)
 
 	body, err = httpGet(fmt.Sprintf("http://127.0.0.1:%d/metrics", s.Port))
 	require.NoError(t, err)
 	assert.Contains(t, body, `
-http_duration_seconds_count{method="POST",path="/hello",status_code="200"} `)
+http_duration_seconds_count{method="GET",path="/hello",status_code="200"} `)
+	assert.Contains(t, body, `
+http_duration_seconds_count{method="POST",path="/hello2",status_code="201"} `)
 }
 
 func TestServer_Panics(t *testing.T) {
@@ -110,7 +122,7 @@ func TestServer_Panics(t *testing.T) {
 }
 
 func TestGetRouter(t *testing.T) {
-	listener, err := net.Listen("tcp", ":0")
+	listener, err := net.Listen("tcp4", ":0")
 	require.NoError(t, err)
 
 	r := metrics.GetRouter()
@@ -128,15 +140,17 @@ func TestGetRouter(t *testing.T) {
 		wg.Done()
 	}()
 
+	target := "http://" + listener.Addr().String()
+
 	var body string
-	body, err = httpGet("http://" + listener.Addr().String() + "/hello")
+	body, err = httpGet(target + "/hello")
 	require.NoError(t, err)
 	assert.Equal(t, "hello!", body)
 
-	body, err = httpGet("http://" + listener.Addr().String() + "/metrics")
+	body, err = httpGet(target + "/metrics")
 	require.NoError(t, err)
 	assert.Contains(t, body, `
-http_duration_seconds_sum{method="GET",path="/metrics",status_code="200"} `)
+http_duration_seconds_sum{method="GET",path="/hello",status_code="200"} `)
 
 	err = s.Shutdown(context.Background())
 	require.NoError(t, err)
@@ -160,7 +174,7 @@ func httpPost(url string, contentType string, requestBody io.Reader) (response s
 }
 
 func httpParseRequest(resp *http.Response) (response string, err error) {
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated {
 		var body []byte
 		if body, err = io.ReadAll(resp.Body); err == nil {
 			response = string(body)

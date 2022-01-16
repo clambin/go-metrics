@@ -1,7 +1,6 @@
 package metrics
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -100,7 +99,6 @@ var (
 		Name: "http_duration_seconds",
 		Help: "Duration of HTTP requests",
 	}, []string{"path", "method", "status_code"})
-	//}, []string{"path", "method"})
 )
 
 // prometheusMiddleware measures the time it takes to perform a /metric call.
@@ -108,39 +106,35 @@ func prometheusMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		route := mux.CurrentRoute(r)
 		path, _ := route.GetPathTemplate()
-		lrw := NewLoggingResponseWriter(w)
+		lrw := newLoggingResponseWriter(w)
 		start := time.Now()
 		next.ServeHTTP(lrw, r)
-		code := lrw.statusCode
-		if code == 0 {
-			// handler didn't explicitly write a header. Default to 200
-			code = http.StatusOK
-		}
-		httpDuration.WithLabelValues(path, r.Method, strconv.Itoa(code)).Observe(time.Since(start).Seconds())
+		httpDuration.WithLabelValues(path, r.Method, strconv.Itoa(lrw.statusCode)).Observe(time.Since(start).Seconds())
 	})
 }
 
-// LoggingResponseWriter records the HTTP status code of a ResponseWriter, so we can use it to log response times for
+// loggingResponseWriter records the HTTP status code of a ResponseWriter, so we can use it to log response times for
 // individual status codes.
-type LoggingResponseWriter struct {
+type loggingResponseWriter struct {
 	http.ResponseWriter
 	statusCode int
-	buf        bytes.Buffer
 }
 
-// NewLoggingResponseWriter creates a new LoggingResponseWriter.
-func NewLoggingResponseWriter(w http.ResponseWriter) *LoggingResponseWriter {
-	return &LoggingResponseWriter{ResponseWriter: w}
+// newLoggingResponseWriter creates a new loggingResponseWriter.
+func newLoggingResponseWriter(w http.ResponseWriter) *loggingResponseWriter {
+	return &loggingResponseWriter{
+		ResponseWriter: w,
+		statusCode:     http.StatusOK, // if the handler doesn't call WriteHeader(), default to HTTP 200
+	}
 }
 
 // WriteHeader implements the http.ResponseWriter interface.
-func (w *LoggingResponseWriter) WriteHeader(code int) {
+func (w *loggingResponseWriter) WriteHeader(code int) {
 	w.statusCode = code
 	w.ResponseWriter.WriteHeader(code)
 }
 
 // Write implements the http.ResponseWriter interface.
-func (w *LoggingResponseWriter) Write(body []byte) (int, error) {
-	w.buf.Write(body)
+func (w *loggingResponseWriter) Write(body []byte) (int, error) {
 	return w.ResponseWriter.Write(body)
 }

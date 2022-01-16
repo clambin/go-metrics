@@ -49,5 +49,4 @@ func TestMetricTools(t *testing.T) {
 	assert.Equal(t, "valueA", metrics.MetricLabel(m, "labelA"))
 	assert.Equal(t, "valueB", metrics.MetricLabel(m, "labelB"))
 	assert.Equal(t, "valueC", metrics.MetricLabel(m, "labelC"))
-
 }
