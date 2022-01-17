@@ -5,7 +5,7 @@
 ![Go Report Card](https://goreportcard.com/badge/github.com/clambin/go-metrics)
 ![GitHub](https://img.shields.io/github/license/clambin/go-metrics?style=plastic)
 
-Some reusable go-metrics code I found myself writing over and over
+Some Prometheus-related code I found myself writing over and over.
 
 ## Documentation
 * [pkg.go.dev](https://pkg.go.dev/github.com/clambin/go-metrics)
