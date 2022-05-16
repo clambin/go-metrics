@@ -1,7 +1,7 @@
-package metrics_test
+package tools_test
 
 import (
-	"github.com/clambin/go-metrics"
+	"github.com/clambin/go-metrics/tools"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"testing"
@@ -37,16 +37,16 @@ func TestMetricTools(t *testing.T) {
 	go c.Collect(ch)
 
 	m := <-ch
-	assert.Equal(t, "foo_bar_gauge", metrics.MetricName(m))
-	assert.Equal(t, 1.0, metrics.MetricValue(m).GetGauge().GetValue())
-	assert.Equal(t, "valueA", metrics.MetricLabel(m, "labelA"))
-	assert.Equal(t, "valueB", metrics.MetricLabel(m, "labelB"))
-	assert.Equal(t, "valueC", metrics.MetricLabel(m, "labelC"))
+	assert.Equal(t, "foo_bar_gauge", tools.MetricName(m))
+	assert.Equal(t, 1.0, tools.MetricValue(m).GetGauge().GetValue())
+	assert.Equal(t, "valueA", tools.MetricLabel(m, "labelA"))
+	assert.Equal(t, "valueB", tools.MetricLabel(m, "labelB"))
+	assert.Equal(t, "valueC", tools.MetricLabel(m, "labelC"))
 
 	m = <-ch
-	assert.Equal(t, "foo_bar_counter", metrics.MetricName(m))
-	assert.Equal(t, 2.0, metrics.MetricValue(m).GetCounter().GetValue())
-	assert.Equal(t, "valueA", metrics.MetricLabel(m, "labelA"))
-	assert.Equal(t, "valueB", metrics.MetricLabel(m, "labelB"))
-	assert.Equal(t, "valueC", metrics.MetricLabel(m, "labelC"))
+	assert.Equal(t, "foo_bar_counter", tools.MetricName(m))
+	assert.Equal(t, 2.0, tools.MetricValue(m).GetCounter().GetValue())
+	assert.Equal(t, "valueA", tools.MetricLabel(m, "labelA"))
+	assert.Equal(t, "valueB", tools.MetricLabel(m, "labelB"))
+	assert.Equal(t, "valueC", tools.MetricLabel(m, "labelC"))
 }

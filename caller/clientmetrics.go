@@ -1,9 +1,10 @@
-package metrics
+package caller
 
 import "github.com/prometheus/client_golang/prometheus"
 
-// APIClientMetrics contains Prometheus metrics to capture during API calls.
-type APIClientMetrics struct {
+// ClientMetrics contains Prometheus metrics to capture during API calls. Each metric is expected to have two labels:
+// the first will contain the application issuing the request. The second will contain the endpoint (i.e. Path) of the request.
+type ClientMetrics struct {
 	Latency *prometheus.SummaryVec // measures latency of an API call
 	Errors  *prometheus.CounterVec // measures any errors returned by an API call
 }
@@ -12,7 +13,7 @@ type APIClientMetrics struct {
 //
 //	err := callAPI(server, endpoint)
 //	pm.ReportErrors(err)
-func (pm *APIClientMetrics) ReportErrors(err error, labelValues ...string) {
+func (pm *ClientMetrics) ReportErrors(err error, labelValues ...string) {
 	if pm == nil || pm.Errors == nil {
 		return
 	}
@@ -32,7 +33,7 @@ func (pm *APIClientMetrics) ReportErrors(err error, labelValues ...string) {
 //	if timer != nil {
 //		timer.ObserveDuration()
 //	}
-func (pm *APIClientMetrics) MakeLatencyTimer(labelValues ...string) (timer *prometheus.Timer) {
+func (pm *ClientMetrics) MakeLatencyTimer(labelValues ...string) (timer *prometheus.Timer) {
 	if pm != nil && pm.Latency != nil {
 		timer = prometheus.NewTimer(pm.Latency.WithLabelValues(labelValues...))
 	}

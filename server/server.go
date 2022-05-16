@@ -1,4 +1,4 @@
-package metrics
+package server
 
 import (
 	"context"
@@ -22,13 +22,13 @@ type Server struct {
 	server   http.Server
 }
 
-// NewServer creates a new Server, which will listen on the specified TCP port. If Port is zero, Server will listen on
+// New creates a new Server, which will listen on the specified TCP port. If Port is zero, Server will listen on
 // a randomly chosen free port.  The selected can be found in Server's Port field.
-func NewServer(port int) (server *Server) {
-	return NewServerWithHandlers(port, []Handler{})
+func New(port int) (server *Server) {
+	return NewWithHandlers(port, []Handler{})
 }
 
-// Handler contains an endpoint to be registered in the Server's HTTP server, using NewServerWithHandlers.
+// Handler contains an endpoint to be registered in the Server's HTTP server, using NewWithHandlers.
 type Handler struct {
 	// Path of the endpoint (e.g. "/health"). Must include the leading /
 	Path string
@@ -38,9 +38,9 @@ type Handler struct {
 	Methods []string
 }
 
-// NewServerWithHandlers creates a new Server with additional handlers. If Port is zero, Server will listen on
+// NewWithHandlers creates a new Server with additional handlers. If Port is zero, Server will listen on
 // a randomly chosen free port.  The selected can be found in Server's Port field.
-func NewServerWithHandlers(port int, handlers []Handler) *Server {
+func NewWithHandlers(port int, handlers []Handler) *Server {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
 	if err != nil {
 		panic("unable to create prometheus metrics server")

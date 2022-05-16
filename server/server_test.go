@@ -1,10 +1,10 @@
-package metrics_test
+package server_test
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/clambin/go-metrics"
+	"github.com/clambin/go-metrics/server"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"io"
@@ -16,7 +16,7 @@ import (
 )
 
 func TestNewServer(t *testing.T) {
-	s := metrics.NewServer(0)
+	s := server.New(0)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -38,7 +38,7 @@ func TestNewServer(t *testing.T) {
 }
 
 func TestNewServerWithHandlers(t *testing.T) {
-	s := metrics.NewServerWithHandlers(0, []metrics.Handler{{
+	s := server.NewWithHandlers(0, []server.Handler{{
 		Path: "/hello",
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			if req.Method == "POST" {
@@ -73,7 +73,7 @@ func TestNewServerWithHandlers(t *testing.T) {
 }
 
 func TestServer_Metrics(t *testing.T) {
-	s := metrics.NewServerWithHandlers(0, []metrics.Handler{
+	s := server.NewWithHandlers(0, []server.Handler{
 		{
 			Path: "/hello",
 			Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -117,15 +117,15 @@ http_duration_seconds_count{method="POST",path="/hello2",status_code="201"} `)
 }
 
 func TestServer_Panics(t *testing.T) {
-	s := metrics.NewServer(0)
-	assert.Panics(t, func() { _ = metrics.NewServer(s.Port) })
+	s := server.New(0)
+	assert.Panics(t, func() { _ = server.New(s.Port) })
 }
 
 func TestGetRouter(t *testing.T) {
 	listener, err := net.Listen("tcp4", ":0")
 	require.NoError(t, err)
 
-	r := metrics.GetRouter()
+	r := server.GetRouter()
 	r.Path("/hello").Handler(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		_, _ = w.Write([]byte("hello!"))
 	}))
