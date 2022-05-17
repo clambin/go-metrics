@@ -20,10 +20,6 @@ var _ Caller = &Cacher{}
 
 // NewCacher creates a new Cacher.  It will also use InstrumentedClient to measure API call performance statistics.
 func NewCacher(httpClient *http.Client, application string, options Options, cacheEntries []CacheTableEntry, cacheExpiry, cacheCleanup time.Duration) *Cacher {
-	if httpClient == nil {
-		httpClient = http.DefaultClient
-	}
-
 	return &Cacher{
 		Caller: &InstrumentedClient{
 			BaseClient:  BaseClient{HTTPClient: httpClient},

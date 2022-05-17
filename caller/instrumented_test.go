@@ -27,7 +27,6 @@ func TestClient_Do(t *testing.T) {
 
 	s := httptest.NewServer(http.HandlerFunc(handler))
 	c := &caller.InstrumentedClient{
-		BaseClient: caller.BaseClient{HTTPClient: http.DefaultClient},
 		Options: caller.Options{
 			PrometheusMetrics: caller.ClientMetrics{
 				Latency: latencyMetric,

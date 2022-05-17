@@ -44,7 +44,7 @@ Note: NewCacher will create a Caller that also generates Prometheus metrics by c
 To avoid this, create the Cacher object directly:
 
 	c := &Cacher{
-		Caller: &BaseClient{HTTPClient: httpClient},
+		Caller: &BaseClient{},
 		Table: CacheTable{Table: cacheEntries},
 		Cache: cache.New[string, []byte](cacheExpiry, cacheCleanup),
 
