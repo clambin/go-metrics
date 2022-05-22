@@ -1,4 +1,4 @@
-package caller
+package client
 
 import (
 	"bufio"
@@ -62,8 +62,8 @@ func (c *Cacher) Do(req *http.Request) (resp *http.Response, err error) {
 	return
 }
 
-func (c Cacher) shouldCache(r *http.Request) (cache bool, expiry time.Duration) {
-	cache, expiry = c.Table.shouldCache(r.URL.Path)
+func (c *Cacher) shouldCache(r *http.Request) (cache bool, expiry time.Duration) {
+	cache, expiry = c.Table.shouldCache(r)
 	if cache && expiry == 0 {
 		expiry = c.Cache.GetDefaultExpiration()
 	}

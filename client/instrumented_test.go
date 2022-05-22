@@ -1,12 +1,11 @@
-package caller_test
+package client_test
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/clambin/go-metrics/caller"
+	"github.com/clambin/go-metrics/client"
 	"github.com/clambin/go-metrics/tools"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -15,24 +14,10 @@ import (
 )
 
 func TestClient_Do(t *testing.T) {
-	latencyMetric := promauto.NewSummaryVec(prometheus.SummaryOpts{
-		Name: "request_duration_seconds",
-		Help: "Duration of API requests.",
-	}, []string{"application", "request"})
-
-	errorMetric := promauto.NewCounterVec(prometheus.CounterOpts{
-		Name: "request_errors",
-		Help: "Duration of API requests.",
-	}, []string{"application", "request"})
-
+	metrics := client.NewMetrics("foo", "bar")
 	s := httptest.NewServer(http.HandlerFunc(handler))
-	c := &caller.InstrumentedClient{
-		Options: caller.Options{
-			PrometheusMetrics: caller.ClientMetrics{
-				Latency: latencyMetric,
-				Errors:  errorMetric,
-			},
-		},
+	c := &client.InstrumentedClient{
+		Options:     client.Options{PrometheusMetrics: metrics},
 		Application: "foo",
 	}
 
@@ -49,7 +34,7 @@ func TestClient_Do(t *testing.T) {
 	require.Error(t, err)
 
 	ch := make(chan prometheus.Metric)
-	go latencyMetric.Collect(ch)
+	go metrics.Latency.Collect(ch)
 
 	expectedLatencyCounters := map[string]uint64{
 		"/foo": 2,
@@ -65,7 +50,7 @@ func TestClient_Do(t *testing.T) {
 	}
 
 	ch = make(chan prometheus.Metric)
-	go errorMetric.Collect(ch)
+	go metrics.Errors.Collect(ch)
 	expectedErrorCounters := map[string]float64{
 		"/foo": 1,
 		"/bar": 0,
@@ -87,7 +72,7 @@ type testStruct struct {
 	Age  int    `json:"age"`
 }
 
-func doCall(c caller.Caller, url string) (response testStruct, err error) {
+func doCall(c client.Caller, url string) (response testStruct, err error) {
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 	var resp *http.Response
 	if resp, err = c.Do(req); err != nil {

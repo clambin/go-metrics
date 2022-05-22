@@ -4,6 +4,7 @@
 ![Test](https://github.com/clambin/go-metrics/workflows/Test/badge.svg)
 ![Go Report Card](https://goreportcard.com/badge/github.com/clambin/go-metrics)
 ![GitHub](https://img.shields.io/github/license/clambin/go-metrics?style=plastic)
+[![GoDoc](https://pkg.go.dev/badge/github.com/clambin/go-metrics?utm_source=godoc)](http://pkg.go.dev/github.com/clambin/go-metrics)
 
 Some Prometheus-related code I found myself writing over and over.
 

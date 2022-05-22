@@ -1,9 +1,9 @@
-package caller_test
+package client_test
 
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/clambin/go-metrics/caller"
+	"github.com/clambin/go-metrics/client"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"net/http"
@@ -15,9 +15,9 @@ import (
 func TestCacher_Do(t *testing.T) {
 	s := &server{}
 	srv := httptest.NewServer(http.HandlerFunc(s.handle))
-	c := caller.NewCacher(
-		nil, "foo", caller.Options{},
-		[]caller.CacheTableEntry{
+	c := client.NewCacher(
+		nil, "foo", client.Options{},
+		[]client.CacheTableEntry{
 			{Endpoint: "/foo"},
 		},
 		50*time.Millisecond, 0,
@@ -60,9 +60,9 @@ func TestCacher_Do(t *testing.T) {
 func TestCacher_Do_MultipleEndpoints(t *testing.T) {
 	s := &server{}
 	srv := httptest.NewServer(http.HandlerFunc(s.handle))
-	c := caller.NewCacher(
-		nil, "foo", caller.Options{},
-		[]caller.CacheTableEntry{
+	c := client.NewCacher(
+		nil, "foo", client.Options{},
+		[]client.CacheTableEntry{
 			{Endpoint: "/foo"},
 			{Endpoint: "/bar", Expiry: 100 * time.Millisecond},
 		},
@@ -122,7 +122,7 @@ func (s *server) handle(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func doCall2(c caller.Caller, url string) (response int, err error) {
+func doCall2(c client.Caller, url string) (response int, err error) {
 	req, _ := http.NewRequest(http.MethodGet, url, nil)
 	var resp *http.Response
 	if resp, err = c.Do(req); err != nil {

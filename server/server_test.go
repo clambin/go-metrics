@@ -62,7 +62,7 @@ func TestNewServerWithHandlers(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "hello!", body)
 
-	body, err = httpGet(fmt.Sprintf("http://127.0.0.1:%d/hello", s.Port))
+	_, err = httpGet(fmt.Sprintf("http://127.0.0.1:%d/hello", s.Port))
 	require.Error(t, err)
 	require.Equal(t, "405 Method Not Allowed", err.Error())
 
